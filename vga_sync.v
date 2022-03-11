@@ -35,6 +35,7 @@ assign blank = ((xc < 192) | (xc > 832) | (yc > 479));
 assign HS = ~ ((xc > 23) & (xc < 65));
 assign VS = ~ ((yc > 489) & (yc < 493));
 assign x = ((xc < 192)?0:(xc - 192));
+//assign x = xc;
 assign y = yc;
 
 always @(posedge CLK)
