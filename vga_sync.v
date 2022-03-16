@@ -34,7 +34,7 @@ reg [9:0] yc;
 assign blank = ((xc < 192) | (xc > 832) | (yc > 479));
 assign HS = ~ ((xc > 23) & (xc < 65));
 assign VS = ~ ((yc > 489) & (yc < 493));
-assign x = ((xc < 192)?0:(xc - 192));
+assign x = ((xc < 192)?10'b1111111111:(xc - 192));
 //assign x = xc;
 assign y = yc;
 
