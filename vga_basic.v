@@ -141,8 +141,18 @@ assign xs2 = x-xp2;
 assign ys2 = y-yp2;
 assign shape1 = (xs >= 0) & (xs < 32) & (ys >= 0) & (ys < 32) & (memory[xs[4:3]+ys*4]>>~xs[2:0]);
 assign shape2 = (xs2 >= 0) & (xs2 < 32) & (ys2 >= 0) & (ys2 < 32) & (memory2[xs2[4:3]+ys2*4]>>~xs2[2:0]);
-assign Red = (~blank &(x >= 0) & (x < 200) & (y > 0) & (y < 300))?7:0;
-assign Green = (shape1|((x > 200) & (x < 400) & (y > 150) & (y < 350)))?7:0;
-assign Blue = (shape2|((x > 300) & (x < 640) & (y > 180) & (y < 480)))?3:0;
+
+reg [2:0] Red2,Green2;
+reg [1:0] Blue2;
+
+always @(posedge CLK)
+begin
+  Red2 <= (~blank &(x >= 0) & (x < 200) & (y > 0) & (y < 300))?7:0;
+  Green2 <= (shape1|((x > 200) & (x < 400) & (y > 150) & (y < 350)))?7:0;
+  Blue2 <= (shape2|((x > 300) & (x < 640) & (y > 180) & (y < 480)))?3:0;
+end
+assign Red = Red2;
+assign Green = Green2;
+assign Blue = Blue2;
 
 endmodule
