@@ -22,11 +22,11 @@ module vga_sync(
     input CLK,
     output HS,
     output VS,
-    output [9:0] x,
+    output signed [10:0] x,
     output [9:0] y,
     output blank
     );
-reg [9:0] xc;
+reg signed [10:0] xc;
 reg [9:0] yc;
 //reg pha;
 // Horizontal 640 + HFP 24 + HS 40 + HBP = 832 pixel ticks
@@ -34,8 +34,8 @@ reg [9:0] yc;
 assign blank = ((xc < 192) | (xc > 832) | (yc > 479));
 assign HS = ~ ((xc > 23) & (xc < 65));
 assign VS = ~ ((yc > 489) & (yc < 493));
-assign x = ((xc < 192)?10'b1111111111:(xc - 192));
-//assign x = xc;
+//assign x = ((xc < 192)?10'b1111111111:(xc - 192));
+assign x = xc-192;
 assign y = yc;
 
 always @(posedge CLK)

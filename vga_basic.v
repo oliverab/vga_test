@@ -32,8 +32,6 @@ assign LED = IO_P1;
 wire CLK;
 clocksyn clock_synth ( .CLKIN_IN (Clk12), 
                    .CLKFX_OUT (CLK));
-wire [9:0] x, y;
-wire blank;
 localparam MEM_SIZE = 128;
 reg [7:0] memory [0:MEM_SIZE-1];
 initial begin
@@ -43,6 +41,9 @@ reg [7:0] memory2 [0:MEM_SIZE-1];
 initial begin
   $readmemh("ball32.txt", memory2);
 end
+wire signed [10:0] x;
+wire [9:0] y;
+wire blank;
 vga_sync vs(.CLK (CLK), .HS (HSync), .VS (VSync), .x (x), .y (y), .blank(blank));
 reg VSync2;
 always @(posedge CLK)
