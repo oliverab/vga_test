@@ -52,144 +52,88 @@ begin
 end
 wire Upd;
 assign Upd = VSync & ~VSync2;
-reg [9:0] xp,yp,xp2,yp2,xp3,yp3;
-reg xd,yd,xd2,yd2,xd3,yd3;
+reg [9:0] xp [0:2],yp [0:2];
+reg xd [0:2],yd [0:2];
 initial begin
-  xp=50;
-  yp=60;
-  xp2=100;
-  yp2=80;
-  xp3=200;
-  yp3=120;
-  xd=1;
-  yd=0;
-  xd2=0;
-  yd2=1;
-  xd3=0;
-  yd3=1;
+  xp[0]=50;
+  yp[0]=60;
+  xp[1]=100;
+  yp[1]=80;
+  xp[2]=200;
+  yp[2]=120;
+  xd[0]=1;
+  yd[0]=0;
+  xd[1]=0;
+  yd[1]=1;
+  xd[2]=0;
+  yd[2]=1;
 end
+integer i;
+
 always @(posedge CLK)
 begin
   if (Upd)
   begin
-    if (xd)
+	 for(i=0; i<3; i=i+1)
 	 begin
-      xp <= xp+1;
-      if (xp>=(640-1-32))
+    if (xd[i])
+	 begin
+      xp[i] <= xp[i]+1;
+      if (xp[i]>=(640-1-32))
 		begin
-		  xd<=0;
+		  xd[i]<=0;
 		end  
     end
 	 else
 	 begin
-      xp <= xp-1;
-      if (xp<=1)
+      xp[i] <= xp[i]-1;
+      if (xp[i]<=1)
 		begin
-		  xd<=1;
+		  xd[i]<=1;
 		end  
     end
-    if (yd)
+    if (yd[i])
 	 begin
-      yp <= yp+1;
-      if (yp>=(480-1-32))
+      yp[i] <= yp[i]+1;
+      if (yp[i]>=(480-1-32))
 		begin
-		  yd<=0;
-		end  
-    end
-	 else
-	 begin
-      yp <= yp-1;
-      if (yp<=1)
-		begin
-		  yd<=1;
-		end  
-    end
-    if (xd2)
-	 begin
-      xp2 <= xp2+1;
-      if (xp2>=(640-1-32))
-		begin
-		  xd2<=0;
+		  yd[i]<=0;
 		end  
     end
 	 else
 	 begin
-      xp2 <= xp2-1;
-      if (xp2<=1)
+      yp[i] <= yp[i]-1;
+      if (yp[i]<=1)
 		begin
-		  xd2<=1;
+		  yd[i]<=1;
 		end  
     end
-    if (yd2)
-	 begin
-      yp2 <= yp2+1;
-      if (yp2>=(480-1-32))
-		begin
-		  yd2<=0;
-		end  
-    end
-	 else
-	 begin
-      yp2 <= yp2-1;
-      if (yp2<=1)
-		begin
-		  yd2<=1;
-		end  
-    end
-    if (xd3)
-	 begin
-      xp3 <= xp3+1;
-      if (xp3>=(640-1-32))
-		begin
-		  xd3<=0;
-		end  
-    end
-	 else
-	 begin
-      xp3 <= xp3-1;
-      if (xp3<=1)
-		begin
-		  xd3<=1;
-		end  
-    end
-    if (yd3)
-	 begin
-      yp3 <= yp3+1;
-      if (yp3>=(480-1-32))
-		begin
-		  yd3<=0;
-		end  
-    end
-	 else
-	 begin
-      yp3 <= yp3-1;
-      if (yp3<=1)
-		begin
-		  yd3<=1;
-		end  
     end
   end
 end
-wire [9:0] xs,ys,xs2,ys2,xs3,ys3;
-wire shape1,shape2,shape3;  //& (memory[x[4:3]+y*4]>>~x[2:0])
-assign xs = x-xp;
-assign ys = y-yp;
-assign xs2 = x-xp2;
-assign ys2 = y-yp2;
-assign xs3 = x-xp3;
-assign ys3 = y-yp3;
-assign shape1 = (xs < 32) & (ys < 32) & (memory[xs[4:3]+ys*4]>>~xs[2:0]);
-assign shape2 = (xs2 < 32) & (ys2 < 32) & (memory2[xs2[4:3]+ys2*4]>>~xs2[2:0]);
-assign shape3 = (xs3 < 32) & (ys3 < 32) & (memory2[xs3[4:3]+ys3*4]>>~xs3[2:0]);
+wire [9:0] xs[2:0],ys[2:0];
+wire shape [2:0];  //& (memory[x[4:3]+y*4]>>~x[2:0])
+
+genvar j;
+generate
+  for(j=0; j<3; j=j+1) 
+  begin:genblk
+    assign xs[j] = x-xp[j];
+    assign ys[j] = y-yp[j];
+  end
+endgenerate
+assign shape[0] = (xs[0] < 32) & (ys[0] < 32) & (memory [xs[0][4:3]+ys[0]*4]>>~xs[0][2:0]);
+assign shape[1] = (xs[1] < 32) & (ys[1] < 32) & (memory2[xs[1][4:3]+ys[1]*4]>>~xs[1][2:0]);
+assign shape[2] = (xs[2] < 32) & (ys[2] < 32) & (memory2[xs[2][4:3]+ys[2]*4]>>~xs[2][2:0]);
 
 reg [2:0] Red2,Green2;
 reg [1:0] Blue2;
 
 always @(posedge CLK)
 begin
-  Red2 <= (shape3^(~blank &(x >= 0) & (x < 200) & (y > 0) & (y < 300)))?7:0;
-  Green2 <= (shape1^((x > 200) & (x < 400) & (y > 150) & (y < 350)))?7:0;
-  Blue2 <= (shape2^((x > 300) & (x < 640) & (y > 180) & (y < 480)))?3:0;
+  Red2 <= (shape[2]^(~blank &(x >= 0) & (x < 200) & (y > 0) & (y < 300)))?7:0;
+  Green2 <= (shape[1]^((x > 200) & (x < 400) & (y > 150) & (y < 350)))?7:0;
+  Blue2 <= (shape[0]^((x > 300) & (x < 640) & (y > 180) & (y < 480)))?3:0;
 end
 assign Red = Red2;
 assign Green = Green2;
