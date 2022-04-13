@@ -52,17 +52,21 @@ begin
 end
 wire Upd;
 assign Upd = VSync & ~VSync2;
-reg [9:0] xp,yp,xp2,yp2;
-reg xd,yd,xd2,yd2;
+reg [9:0] xp,yp,xp2,yp2,xp3,yp3;
+reg xd,yd,xd2,yd2,xd3,yd3;
 initial begin
   xp=50;
   yp=60;
   xp2=100;
   yp2=80;
+  xp3=200;
+  yp3=120;
   xd=1;
-  yd=2;
+  yd=0;
   xd2=0;
   yd2=1;
+  xd3=0;
+  yd3=1;
 end
 always @(posedge CLK)
 begin
@@ -132,23 +136,58 @@ begin
 		  yd2<=1;
 		end  
     end
+    if (xd3)
+	 begin
+      xp3 <= xp3+1;
+      if (xp3>=(640-1-32))
+		begin
+		  xd3<=0;
+		end  
+    end
+	 else
+	 begin
+      xp3 <= xp3-1;
+      if (xp3<=1)
+		begin
+		  xd3<=1;
+		end  
+    end
+    if (yd3)
+	 begin
+      yp3 <= yp3+1;
+      if (yp3>=(480-1-32))
+		begin
+		  yd3<=0;
+		end  
+    end
+	 else
+	 begin
+      yp3 <= yp3-1;
+      if (yp3<=1)
+		begin
+		  yd3<=1;
+		end  
+    end
   end
 end
-wire [9:0] xs,ys,xs2,ys2;
-wire shape1,shape2;  //& (memory[x[4:3]+y*4]>>~x[2:0])
+wire [9:0] xs,ys,xs2,ys2,xs3,ys3;
+wire shape1,shape2,shape3;  //& (memory[x[4:3]+y*4]>>~x[2:0])
 assign xs = x-xp;
 assign ys = y-yp;
 assign xs2 = x-xp2;
 assign ys2 = y-yp2;
+assign xs3 = x-xp3;
+assign ys3 = y-yp3;
 assign shape1 = (xs < 32) & (ys < 32) & (memory[xs[4:3]+ys*4]>>~xs[2:0]);
 assign shape2 = (xs2 < 32) & (ys2 < 32) & (memory2[xs2[4:3]+ys2*4]>>~xs2[2:0]);
+assign shape3 = (xs3 < 32) & (ys3 < 32) & (memory2[xs3[4:3]+ys3*4]>>~xs3[2:0]);
 
 reg [2:0] Red2,Green2;
 reg [1:0] Blue2;
 
 always @(posedge CLK)
 begin
-  Red2 <= (~blank &(x >= 0) & (x < 200) & (y > 0) & (y < 300))?7:0;
+  Red2 <= (shape3^(~blank &(x >= 0) & (x < 200) & (y > 0) & (y < 300)))?7:0;
   Green2 <= (shape1^((x > 200) & (x < 400) & (y > 150) & (y < 350)))?7:0;
   Blue2 <= (shape2^((x > 300) & (x < 640) & (y > 180) & (y < 480)))?3:0;
 end
