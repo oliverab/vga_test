@@ -22,7 +22,7 @@ module vga_sync(
     input CLK,
     output HS,
     output VS,
-    output signed [10:0] x,
+    output [10:0] x,
     output [9:0] y,
     output blank
     );

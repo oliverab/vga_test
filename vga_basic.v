@@ -41,7 +41,7 @@ reg [7:0] memory2 [0:MEM_SIZE-1];
 initial begin
   $readmemh("ball32.txt", memory2);
 end
-wire signed [10:0] x;
+wire [10:0] x;
 wire [9:0] y;
 wire blank;
 vga_sync vs(.CLK (CLK), .HS (HSync), .VS (VSync), .x (x), .y (y), .blank(blank));
