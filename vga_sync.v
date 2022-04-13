@@ -22,11 +22,11 @@ module vga_sync(
     input CLK,
     output HS,
     output VS,
-    output [10:0] x,
+    output [9:0] x,
     output [9:0] y,
     output blank
     );
-reg signed [10:0] xc;
+reg [9:0] xc;
 reg [9:0] yc;
 //reg pha;
 // Horizontal 640 + HFP 24 + HS 40 + HBP = 832 pixel ticks
