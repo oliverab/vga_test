@@ -52,8 +52,10 @@ begin
 end
 wire Upd;
 assign Upd = VSync & ~VSync2;
-reg [9:0] xp [0:2],yp [0:2];
-reg xd [0:2],yd [0:2];
+
+localparam SP_COUNT =3;
+reg [9:0] xp [0:SP_COUNT-1],yp [0:SP_COUNT-1];
+reg xd [0:SP_COUNT-1],yd [0:SP_COUNT-1];
 initial begin
   xp[0]=50;
   yp[0]=60;
@@ -74,7 +76,7 @@ always @(posedge CLK)
 begin
   if (Upd)
   begin
-	 for(i=0; i<3; i=i+1)
+	 for(i=0; i<SP_COUNT; i=i+1)
 	 begin
     if (xd[i])
 	 begin
@@ -111,12 +113,12 @@ begin
     end
   end
 end
-wire [9:0] xs[2:0],ys[2:0];
-wire shape [2:0];  //& (memory[x[4:3]+y*4]>>~x[2:0])
+wire [9:0] xs[0:SP_COUNT-1],ys[0:SP_COUNT-1];
+wire shape [0:SP_COUNT-1];  //& (memory[x[4:3]+y*4]>>~x[2:0])
 
 genvar j;
 generate
-  for(j=0; j<3; j=j+1) 
+  for(j=0; j<SP_COUNT; j=j+1) 
   begin:genblk
     assign xs[j] = x-xp[j];
     assign ys[j] = y-yp[j];
